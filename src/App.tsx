@@ -1,26 +1,86 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, ReactElement } from "react";
+import "./App.css";
+import {
+  Route,
+  Switch,
+  RouteComponentProps,
+  useHistory,
+} from "react-router-dom";
+import { NoMatch } from "./components/NoMatch";
+import { Home } from "./components/Home";
+import { useAuth } from "./hooks/useAuth";
+import GitHubIcon from "@material-ui/icons/GitHub";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import {
+  Button,
+  Link,
+  Grid,
+  Typography,
+  Container,
+  useScrollTrigger,
+  CssBaseline,
+  AppBar,
+  Toolbar,
+  Box,
+} from "@material-ui/core";
+
+function ElevationScroll(props: { children: ReactElement }) {
+  const { children } = props;
+  const trigger = useScrollTrigger({
+    disableHysteresis: true,
+    threshold: 0,
+  });
+  return React.cloneElement(children, {
+    elevation: trigger ? 4 : 0,
+  });
 }
 
-export default App;
+export const App: React.FC<{}> = (props) => {
+  const [isAuthenticated, handleAuthentication, logOut] = useAuth();
+  const authenticationHandler = (props: RouteComponentProps) => {
+    if (/access_token/.test(props.location.search)) {
+      handleAuthentication();
+    }
+  };
+  const handleLogout = () => logOut();
+  return (
+    <div>
+      <CssBaseline />
+      <ElevationScroll {...props}>
+        <AppBar>
+          <Toolbar>
+            <Box mr={2}>
+              <GitHubIcon />
+            </Box>
+            <Typography
+              variant="h6"
+              style={{
+                flexGrow: 1,
+              }}
+            >
+              Github Issue Searcher
+            </Typography>
+            {isAuthenticated() && (
+              <Button onClick={handleLogout} color="inherit">
+                Logout
+              </Button>
+            )}
+          </Toolbar>
+        </AppBar>
+      </ElevationScroll>
+      <Toolbar />
+      <Switch>
+        <Route exact path="/" render={(props) => <Home {...props} />} />
+        <Route
+          exact
+          path="/callback"
+          render={(props) => {
+            authenticationHandler(props);
+            return null;
+          }}
+        />
+        <Route component={NoMatch} />
+      </Switch>
+    </div>
+  );
+};
