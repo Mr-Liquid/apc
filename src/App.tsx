@@ -35,7 +35,7 @@ function ElevationScroll(props: { children: ReactElement }) {
   });
 }
 
-export const App: React.FC<{}> = (props) => {
+export const App: React.FC<{}> = () => {
   const [isAuthenticated, handleAuthentication, logOut] = useAuth();
   const authenticationHandler = (props: RouteComponentProps) => {
     if (/access_token/.test(props.location.search)) {
@@ -46,7 +46,7 @@ export const App: React.FC<{}> = (props) => {
   return (
     <div>
       <CssBaseline />
-      <ElevationScroll {...props}>
+      <ElevationScroll>
         <AppBar>
           <Toolbar>
             <Box mr={2}>
