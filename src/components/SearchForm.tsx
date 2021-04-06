@@ -18,7 +18,7 @@ type FormData = {
   repo: string;
 };
 
-export const SearchForm = () => {
+export const SearchForm: React.FC<{}> = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
   const selectFilter = useMemo(makeFilter, []);
